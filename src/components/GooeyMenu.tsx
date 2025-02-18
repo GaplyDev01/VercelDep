@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarChart, Plus, Heart, MessageCircle, Settings, Brain, ChartLine } from 'lucide-react';
+import { BarChart, Plus, Heart, MessageCircle, Settings, Brain, LineChart } from 'lucide-react';
 
 interface GooeyMenuProps {
   onModeSwitch: () => void;
@@ -21,7 +21,7 @@ const GooeyMenu: React.FC<GooeyMenuProps> = ({ onModeSwitch, isPerplexityMode })
           <Brain className="w-6 h-6" />
         </a>
         <a href="#" className="menu-item">
-          <ChartLine className="w-6 h-6" />
+          <LineChart className="w-6 h-6" />
         </a>
         <a href="#" className="menu-item">
           <Plus className="w-6 h-6" />
