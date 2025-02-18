@@ -126,7 +126,7 @@ export class AIService {
     `;
   }
 
-  private parseAnalysisResponse(aiResponse: string): AnalysisResponse {
+  private parseAnalysisResponse(_response: string): AnalysisResponse {
     // Simple parsing logic - in production, use more robust parsing
     return {
       signalStrength: 7,
