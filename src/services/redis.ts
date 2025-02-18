@@ -24,19 +24,6 @@ class RedisService {
     return RedisService.instance;
   }
 
-  // Generic get/set methods
-  async get(key: string): Promise<string | null> {
-    return await this.redis.get(key);
-  }
-
-  async set(key: string, value: string, ttl?: number): Promise<void> {
-    if (ttl) {
-      await this.redis.setex(key, ttl, value);
-    } else {
-      await this.redis.set(key, value);
-    }
-  }
-
   // Cache message history for each conversation
   async cacheMessages(conversationId: string, messages: any[], ttl: number = 3600): Promise<void> {
     await this.redis.setex(
