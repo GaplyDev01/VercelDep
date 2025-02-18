@@ -40,7 +40,7 @@ const ChatUI: React.FC = () => {
       <div className="relative flex items-center justify-between px-6 py-4 border-b border-emerald-500/20 bg-black/40 backdrop-blur-3xl z-10">
         <div className="flex items-center space-x-3">
           <div className="h-3 w-3 rounded-full bg-emerald-500 animate-pulse" />
-          <h2 className="text-emerald-500 font-['JetBrains_Mono'] text-sm font-medium">TradesXBT AI</h2>
+          <h2 className="text-emerald-500 font-['JetBrains_Mono'] text-sm font-medium">tradesXBT</h2>
         </div>
         <button className="text-emerald-500/70 hover:text-emerald-400 transition-colors">
           <ChevronDown size={20} />
