@@ -11,7 +11,8 @@
     }
   },
   "env": {
-    "REDIS_URL": "redis://default:raUhiLy5OV6HmPuPtldEcTzgaTOiSdos@redis-10632.c278.us-east-1-4.ec2.redns.redis-cloud.com:10632"
+    "REDIS_URL": "redis://default:raUhiLy5OV6HmPuPtldEcTzgaTOiSdos@redis-10632.c278.us-east-1-4.ec2.redns.redis-cloud.com:10632",
+    "OPENAI_API_KEY": "sk-zLxNDEEbgKdRsxLzLxNDT3BlbkFJzLxNDEEbgKdRsxLz"
   },
   "headers": [
     {
