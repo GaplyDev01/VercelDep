@@ -3,5 +3,18 @@
   "buildCommand": "vite build",
   "installCommand": "npm install",
   "framework": "vite",
-  "outputDirectory": "dist"
+  "outputDirectory": "dist",
+  "functions": {
+    "api/*.ts": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  },
+  "env": {
+    "REDIS_URL": "redis://default:raUhiLy5OV6HmPuPtldEcTzgaTOiSdos@redis-10632.c278.us-east-1-4.ec2.redns.redis-cloud.com:10632"
+  },
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
 }
