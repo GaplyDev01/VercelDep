@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import HomePage from './pages/HomePage';
 import Terminal from './pages/Terminal';
 import Feeds from './pages/Feeds';
 import PNL from './pages/PNL';
-import ChatUI from './components/ChatUI';
 
 function App() {
   return (
@@ -34,9 +33,6 @@ function App() {
           </Routes>
         </Router>
       </AuthProvider>
-      <div className="app-container">
-        <ChatUI />
-      </div>
     </>
   );
 }
