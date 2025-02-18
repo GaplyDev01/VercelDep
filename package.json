@@ -5,12 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "lint:fix": "eslint . --ext ts,tsx --fix",
-    "typecheck": "tsc --noEmit",
-    "format": "prettier --write \"src/**/*.{ts,tsx}\""
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@project-serum/anchor": "^0.26.0",
@@ -33,11 +29,7 @@
     "@types/react-dom": "^18.2.19",
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.17",
-    "eslint": "^8.56.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-refresh": "^0.4.5",
     "postcss": "^8.4.35",
-    "prettier": "^3.2.5",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.3.3",
     "vite": "^5.1.3"
