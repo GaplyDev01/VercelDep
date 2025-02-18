@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Send, ChevronDown } from 'lucide-react';
+import FrogHeadSVG from './FrogHeadSVG';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -25,9 +26,14 @@ const ChatUI: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-black border border-emerald-500/20">
+    <div className="flex flex-col h-full bg-black border border-emerald-500/20 relative overflow-hidden">
+      {/* Background Frog SVG */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <FrogHeadSVG className="w-[70%] h-[70%] text-emerald-500/[0.02] transform rotate-[-10deg]" />
+      </div>
+
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-emerald-500/20 bg-black/40 backdrop-blur-xl">
+      <div className="relative flex items-center justify-between px-6 py-4 border-b border-emerald-500/20 bg-black/40 backdrop-blur-xl">
         <div className="flex items-center space-x-3">
           <div className="h-3 w-3 rounded-full bg-emerald-500 animate-pulse" />
           <h2 className="text-emerald-500 font-['JetBrains_Mono'] text-sm font-medium">TradesXBT AI</h2>
@@ -38,7 +44,7 @@ const ChatUI: React.FC = () => {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin scrollbar-thumb-emerald-500/20 scrollbar-track-black">
+      <div className="relative flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin scrollbar-thumb-emerald-500/20 scrollbar-track-black/40">
         {messages.map((message, index) => (
           <div
             key={index}
@@ -49,7 +55,7 @@ const ChatUI: React.FC = () => {
                 message.role === 'user'
                   ? 'bg-emerald-500/10 text-emerald-500 ml-12'
                   : 'bg-black/40 text-emerald-400 mr-12'
-              } font-['JetBrains_Mono'] text-sm leading-relaxed`}
+              } font-['JetBrains_Mono'] text-sm leading-relaxed shadow-lg shadow-emerald-500/5`}
             >
               {message.content}
               <div className={`text-xs mt-2 ${
@@ -63,7 +69,7 @@ const ChatUI: React.FC = () => {
       </div>
 
       {/* Input area */}
-      <div className="p-6 border-t border-emerald-500/20 bg-black/40 backdrop-blur-xl">
+      <div className="relative p-6 border-t border-emerald-500/20 bg-black/40 backdrop-blur-xl">
         <div className="flex items-center space-x-4">
           <input
             type="text"
