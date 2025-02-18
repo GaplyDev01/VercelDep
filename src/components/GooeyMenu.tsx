@@ -1,5 +1,6 @@
 import React from 'react';
-import { BarChart, Plus, Heart, MessageCircle, Settings, Brain, LineChart } from 'lucide-react';
+import { BarChart, Plus, MessageCircle, Settings, Brain, LineChart } from 'lucide-react';
+import FrogHeadSVG from './FrogHeadSVG';
 
 interface GooeyMenuProps {
   onModeSwitch: () => void;
@@ -12,9 +13,7 @@ const GooeyMenu: React.FC<GooeyMenuProps> = ({ onModeSwitch, isPerplexityMode })
       <nav className="menu">
         <input type="checkbox" className="menu-open" name="menu-open" id="menu-open"/>
         <label className="menu-open-button" htmlFor="menu-open">
-          <span className="hamburger hamburger-1"></span>
-          <span className="hamburger hamburger-2"></span>
-          <span className="hamburger hamburger-3"></span>
+          <FrogHeadSVG className="w-7 h-7 text-white transform scale-[1.15]" />
         </label>
         
         <a href="#" className="menu-item" onClick={() => onModeSwitch()}>
@@ -82,43 +81,6 @@ const GooeyMenu: React.FC<GooeyMenuProps> = ({ onModeSwitch, isPerplexityMode })
           display: none;
         }
 
-        .hamburger {
-          width: 25px;
-          height: 3px;
-          background: white;
-          display: block;
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          margin-left: -12.5px;
-          margin-top: -1.5px;
-          transition: transform 200ms;
-        }
-
-        .hamburger-1 {
-          transform: translate3d(0,-8px,0);
-        }
-
-        .hamburger-2 {
-          transform: translate3d(0,0,0);
-        }
-
-        .hamburger-3 {
-          transform: translate3d(0,8px,0);
-        }
-
-        .menu-open:checked + .menu-open-button .hamburger-1 {
-          transform: translate3d(0,0,0) rotate(45deg);
-        }
-
-        .menu-open:checked + .menu-open-button .hamburger-2 {
-          transform: translate3d(0,0,0) scale(0.1,1);
-        }
-
-        .menu-open:checked + .menu-open-button .hamburger-3 {
-          transform: translate3d(0,0,0) rotate(-45deg);
-        }
-
         .menu-item:hover {
           background: white;
           color: #10B981;
@@ -145,7 +107,7 @@ const GooeyMenu: React.FC<GooeyMenuProps> = ({ onModeSwitch, isPerplexityMode })
         .menu-open:checked + .menu-open-button {
           transition-timing-function: linear;
           transition-duration: 200ms;
-          transform: scale(0.8,0.8) translate3d(0,0,0);
+          transform: scale(0.8,0.8) translate3d(0,0,0) rotate(45deg);
         }
 
         .menu-open:checked ~ .menu-item {
