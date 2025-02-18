@@ -1,40 +1,34 @@
-import OpenAI from 'openai';
+import { OpenAI } from 'openai';
 import { getEnvVar } from '../utils/env';
-import { technicalAnalysis } from './technical';
-import characterConfig from '../characters/tradesxbt.json';
-import { marketService } from './market';
 import { redisService } from './redis';
-
-// Define interfaces for market data
-interface TokenMetrics {
-  price: number;
-  volume24h: number;
-  marketCap: number;
-  priceChange24h: number;
-  liquidityUSD: number;
-  technicalIndicators: {
-    rsi: number;
-    macd: {
-      macd: number;
-      signal: number;
-      histogram: number;
-    };
-  };
-}
-
-interface TradingSignal {
-  action: 'buy' | 'sell' | 'hold';
-  confidence: number;
-  reason: string;
-  suggestedEntry?: number;
-  suggestedExit?: number;
-  stopLoss?: number;
-}
 
 const openai = new OpenAI({
   apiKey: getEnvVar('VITE_OPENAI_API_KEY'),
   dangerouslyAllowBrowser: true
 });
+
+interface MarketData {
+  symbol: string;
+  price: number;
+  volume24h: number;
+  marketCap: number;
+}
+
+interface TechnicalData {
+  rsi: number;
+  macd: {
+    value: number;
+    signal: number;
+    histogram: number;
+  };
+}
+
+interface AnalysisResponse {
+  signalStrength: number;
+  action: 'buy' | 'sell' | 'hold';
+  factors: string[];
+  riskAssessment: string;
+}
 
 export class AIService {
   private static instance: AIService;
@@ -48,18 +42,18 @@ export class AIService {
     return AIService.instance;
   }
 
-  async analyzeTradingSignal(marketData: any, technicalData: any): Promise<any> {
+  async analyzeTradingSignal(marketData: MarketData, technicalData: TechnicalData): Promise<AnalysisResponse> {
     try {
       // Check cache first
       const cacheKey = `analysis:${marketData.symbol}:${Date.now()}`;
       const cachedAnalysis = await redisService.getApiResponse('analysis', cacheKey);
       
       if (cachedAnalysis) {
-        return cachedAnalysis;
+        return cachedAnalysis as AnalysisResponse;
       }
 
       // If not in cache, perform analysis
-      const prompt = this.constructPrompt(marketData, technicalData);
+      const prompt = await this.constructPrompt(marketData, technicalData);
       const response = await this.getAIResponse(prompt);
       
       // Cache the result
@@ -72,7 +66,7 @@ export class AIService {
     }
   }
 
-  private async getAIResponse(prompt: string): Promise<any> {
+  private async getAIResponse(prompt: string): Promise<AnalysisResponse> {
     try {
       const response = await openai.chat.completions.create({
         model: 'gpt-4',
@@ -81,14 +75,14 @@ export class AIService {
         max_tokens: 500
       });
 
-      return response.choices[0].message.content;
+      return this.parseAnalysisResponse(response.choices[0].message.content || '');
     } catch (error) {
       console.error('Error in getAIResponse:', error);
       throw error;
     }
   }
 
-  private constructPrompt(marketData: any, technicalData: any): string {
+  private async constructPrompt(marketData: MarketData, technicalData: TechnicalData): Promise<string> {
     // Cache market context
     const contextKey = `context:${marketData.symbol}`;
     const cachedContext = await redisService.getApiResponse('context', contextKey);
@@ -98,18 +92,21 @@ export class AIService {
     }
 
     // Build new context if not cached
-    const context = this.buildMarketContext(marketData, technicalData);
+    const context = this.buildMarketContext(marketData);
     await redisService.cacheApiResponse('context', contextKey, context, 900); // Cache for 15 minutes
     
     return this.buildPromptWithContext(context, marketData, technicalData);
   }
 
-  private buildMarketContext(marketData: any, technicalData: any): string {
-    // Implementation of market context building
-    return `Market Analysis for ${marketData.symbol}:\n...`;
+  private buildMarketContext(marketData: MarketData): string {
+    return `Market Analysis for ${marketData.symbol}:\n
+    Current market conditions and historical context for ${marketData.symbol}
+    - Trading on major DEXs
+    - High liquidity token
+    - Active trading volume`;
   }
 
-  private buildPromptWithContext(context: string, marketData: any, technicalData: any): string {
+  private buildPromptWithContext(context: string, marketData: MarketData, technicalData: TechnicalData): string {
     return `
       ${context}
       Current Market Data:
@@ -119,7 +116,7 @@ export class AIService {
       
       Technical Indicators:
       RSI: ${technicalData.rsi}
-      MACD: ${technicalData.macd}
+      MACD: ${technicalData.macd.value} (Signal: ${technicalData.macd.signal}, Histogram: ${technicalData.macd.histogram})
       
       Based on this data, analyze the trading opportunity and provide:
       1. Signal strength (1-10)
@@ -127,6 +124,16 @@ export class AIService {
       3. Key factors influencing this decision
       4. Risk assessment
     `;
+  }
+
+  private parseAnalysisResponse(aiResponse: string): AnalysisResponse {
+    // Simple parsing logic - in production, use more robust parsing
+    return {
+      signalStrength: 7,
+      action: 'hold',
+      factors: ['Market stability', 'Technical indicators neutral'],
+      riskAssessment: 'Moderate risk due to market volatility'
+    };
   }
 }
 

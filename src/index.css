@@ -4,7 +4,106 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --primary-color: #10B981;
+  --background-color: #18181B;
+  --text-color: #F4F4F5;
+}
+
 body {
-  background-color: #18181B;
+  background-color: var(--background-color);
   font-family: 'Kode Mono', monospace;
+  color: var(--text-color);
+}
+
+.menu {
+  filter: url('#goo');
+  padding: 1rem;
+  position: relative;
+}
+
+.menu-item, .menu-open-button {
+  background-color: var(--primary-color);
+  border-radius: 100%;
+  width: 2.5rem;
+  height: 2.5rem;
+  position: absolute;
+  color: white;
+  text-align: center;
+  line-height: 2.5rem;
+  transform: translate3d(0, 0, 0);
+  transition: transform ease-out 200ms;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-open {
+  display: none;
+}
+
+.menu-item {
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.menu-open:checked ~ .menu-item {
+  opacity: 1;
+}
+
+.menu-open:checked ~ .menu-item:nth-child(3) {
+  transform: translate3d(0.5em, -7em, 0);
+}
+.menu-open:checked ~ .menu-item:nth-child(4) {
+  transform: translate3d(-6.5em, -4.5em, 0);
+}
+.menu-open:checked ~ .menu-item:nth-child(5) {
+  transform: translate3d(-8em, 0.5em, 0);
+}
+.menu-open:checked ~ .menu-item:nth-child(6) {
+  transform: translate3d(-6em, 5.5em, 0);
+}
+.menu-open:checked ~ .menu-item:nth-child(7) {
+  transform: translate3d(0.5em, 7em, 0);
+}
+
+.menu-open:checked ~ .menu-open-button {
+  transform: rotate(45deg);
+}
+
+.chat-container {
+  @apply flex flex-col h-screen bg-zinc-900;
+}
+
+.messages-container {
+  @apply flex-1 overflow-y-auto p-4 space-y-4;
+}
+
+.message {
+  @apply p-4 rounded-lg max-w-3xl mx-auto;
+}
+
+.user-message {
+  @apply bg-emerald-600 text-white ml-auto;
+}
+
+.assistant-message {
+  @apply bg-zinc-800 text-white mr-auto;
+}
+
+.input-container {
+  @apply p-4 bg-zinc-800 border-t border-zinc-700;
+}
+
+.input-wrapper {
+  @apply flex items-center gap-4 max-w-3xl mx-auto;
+}
+
+.chat-input {
+  @apply flex-1 bg-zinc-900 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500;
+}
+
+.send-button {
+  @apply bg-emerald-600 text-white p-2 rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500;
 }
