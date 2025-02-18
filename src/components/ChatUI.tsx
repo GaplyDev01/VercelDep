@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Send, ChevronDown } from 'lucide-react';
 import FrogHeadSVG from './FrogHeadSVG';
+import GooeyMenu from './GooeyMenu';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -11,6 +12,7 @@ interface Message {
 const ChatUI: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
+  const [isPerplexityMode, setIsPerplexityMode] = useState(false);
 
   const handleSend = () => {
     if (!input.trim()) return;
@@ -23,6 +25,10 @@ const ChatUI: React.FC = () => {
     
     setMessages([...messages, newMessage]);
     setInput('');
+  };
+
+  const handleModeSwitch = () => {
+    setIsPerplexityMode(!isPerplexityMode);
   };
 
   return (
@@ -70,6 +76,11 @@ const ChatUI: React.FC = () => {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Gooey Menu */}
+      <div className="relative z-20">
+        <GooeyMenu onModeSwitch={handleModeSwitch} isPerplexityMode={isPerplexityMode} />
       </div>
 
       {/* Input area */}
