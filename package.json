@@ -16,6 +16,7 @@
     "@solana/web3.js": "^1.98.0",
     "@supabase/supabase-js": "^2.39.7",
     "axios": "^1.7.9",
+    "ioredis": "^5.5.0",
     "lucide-react": "^0.344.0",
     "openai": "^4.85.1",
     "react": "^18.2.0",

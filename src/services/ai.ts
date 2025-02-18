@@ -3,6 +3,7 @@ import { getEnvVar } from '../utils/env';
 import { technicalAnalysis } from './technical';
 import characterConfig from '../characters/tradesxbt.json';
 import { marketService } from './market';
+import { redisService } from './redis';
 
 // Define interfaces for market data
 interface TokenMetrics {
@@ -36,40 +37,43 @@ const openai = new OpenAI({
 });
 
 export class AIService {
-  private birdeyeApiKey: string;
-  private characterSystemPrompt: string;
-  private characterContext: {
-    bio: string[];
-    lore: string[];
-    knowledge: string[];
-  };
+  private static instance: AIService;
+  
+  private constructor() {}
 
-  constructor() {
-    this.birdeyeApiKey = getEnvVar('VITE_BIRDEYE_API_KEY');
-    this.characterContext = {
-      bio: characterConfig.bio || [],
-      lore: characterConfig.lore || [],
-      knowledge: characterConfig.knowledge || []
-    };
-    this.characterSystemPrompt = characterConfig.system?.join('\n') || '';
+  public static getInstance(): AIService {
+    if (!AIService.instance) {
+      AIService.instance = new AIService();
+    }
+    return AIService.instance;
   }
 
-  async analyzeTradingSignal(tokenAddress: string): Promise<TradingSignal> {
+  async analyzeTradingSignal(marketData: any, technicalData: any): Promise<any> {
     try {
-      const metrics = await this.getTokenMetrics(tokenAddress);
-      const { rsi, macd } = metrics.technicalIndicators;
+      // Check cache first
+      const cacheKey = `analysis:${marketData.symbol}:${Date.now()}`;
+      const cachedAnalysis = await redisService.getApiResponse('analysis', cacheKey);
+      
+      if (cachedAnalysis) {
+        return cachedAnalysis;
+      }
 
-      const prompt = [
-        this.characterSystemPrompt,
-        'Analyze the following market data and provide a trading signal:',
-        `RSI: ${rsi}`,
-        `MACD: ${macd.macd} (Signal: ${macd.signal}, Histogram: ${macd.histogram})`,
-        `Price: $${metrics.price}`,
-        `24h Volume: $${metrics.volume24h}`,
-        `Market Cap: $${metrics.marketCap}`,
-        `24h Price Change: ${metrics.priceChange24h}%`
-      ].join('\n');
+      // If not in cache, perform analysis
+      const prompt = this.constructPrompt(marketData, technicalData);
+      const response = await this.getAIResponse(prompt);
+      
+      // Cache the result
+      await redisService.cacheApiResponse('analysis', cacheKey, response, 300); // Cache for 5 minutes
+      
+      return response;
+    } catch (error) {
+      console.error('Error in analyzeTradingSignal:', error);
+      throw error;
+    }
+  }
 
+  private async getAIResponse(prompt: string): Promise<any> {
+    try {
       const response = await openai.chat.completions.create({
         model: 'gpt-4',
         messages: [{ role: 'system', content: prompt }],
@@ -77,39 +81,53 @@ export class AIService {
         max_tokens: 500
       });
 
-      const analysis = response.choices[0].message.content || '';
-      return this.parseTradingSignal(analysis);
+      return response.choices[0].message.content;
     } catch (error) {
-      console.error('Error analyzing trading signal:', error);
+      console.error('Error in getAIResponse:', error);
       throw error;
     }
   }
 
-  private async getTokenMetrics(tokenAddress: string): Promise<TokenMetrics> {
-    const marketData = await marketService.fetchBirdeyeData(tokenAddress);
-    const prices = [marketData.price]; // In a real app, you'd fetch historical prices
+  private constructPrompt(marketData: any, technicalData: any): string {
+    // Cache market context
+    const contextKey = `context:${marketData.symbol}`;
+    const cachedContext = await redisService.getApiResponse('context', contextKey);
+    
+    if (cachedContext) {
+      return this.buildPromptWithContext(cachedContext, marketData, technicalData);
+    }
 
-    return {
-      price: marketData.price,
-      volume24h: marketData.volume24h,
-      marketCap: marketData.marketCap,
-      priceChange24h: marketData.priceChange24h,
-      liquidityUSD: 0, // Would need to fetch from DEX
-      technicalIndicators: {
-        rsi: technicalAnalysis.calculateRSI(prices),
-        macd: technicalAnalysis.calculateMACD(prices)
-      }
-    };
+    // Build new context if not cached
+    const context = this.buildMarketContext(marketData, technicalData);
+    await redisService.cacheApiResponse('context', contextKey, context, 900); // Cache for 15 minutes
+    
+    return this.buildPromptWithContext(context, marketData, technicalData);
   }
 
-  private parseTradingSignal(analysis: string): TradingSignal {
-    // In a real app, you'd implement proper parsing logic
-    return {
-      action: 'hold',
-      confidence: 0.5,
-      reason: analysis
-    };
+  private buildMarketContext(marketData: any, technicalData: any): string {
+    // Implementation of market context building
+    return `Market Analysis for ${marketData.symbol}:\n...`;
+  }
+
+  private buildPromptWithContext(context: string, marketData: any, technicalData: any): string {
+    return `
+      ${context}
+      Current Market Data:
+      Price: ${marketData.price}
+      24h Volume: ${marketData.volume24h}
+      Market Cap: ${marketData.marketCap}
+      
+      Technical Indicators:
+      RSI: ${technicalData.rsi}
+      MACD: ${technicalData.macd}
+      
+      Based on this data, analyze the trading opportunity and provide:
+      1. Signal strength (1-10)
+      2. Recommended action (buy/sell/hold)
+      3. Key factors influencing this decision
+      4. Risk assessment
+    `;
   }
 }
 
-export const aiService = new AIService();
+export const aiService = AIService.getInstance();
